@@ -32,7 +32,7 @@ def initialize_database():
         ]
 
         cursor.executemany(
-            "INSERT INTO tasks(title, done) VALUES(?, ?)",
+            "INSERT INTO tasks (title, done) VALUES (?, ?)",
             sample_tasks
         )
 
@@ -72,3 +72,26 @@ def get_task_by_id(task_id):
         return dict(row)
 
     return None
+
+
+# Insert a new task
+def create_task(title):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO tasks (title, done) VALUES (?, ?)",
+        (title, False)
+    )
+
+    conn.commit()
+
+    task_id = cursor.lastrowid
+
+    conn.close()
+
+    return {
+        "id": task_id,
+        "title": title,
+        "done": False
+    }
