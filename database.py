@@ -74,7 +74,7 @@ def get_task_by_id(task_id):
     return None
 
 
-# Insert a new task
+# Insert new task
 def create_task(title):
     conn = get_connection()
     cursor = conn.cursor()
@@ -95,3 +95,50 @@ def create_task(title):
         "title": title,
         "done": False
     }
+
+
+# Update task
+def update_task(task_id, title, done):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "UPDATE tasks SET title = ?, done = ? WHERE id = ?",
+        (title, done, task_id)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        conn.close()
+        return None
+
+    cursor.execute(
+        "SELECT * FROM tasks WHERE id = ?",
+        (task_id,)
+    )
+
+    task = dict(cursor.fetchone())
+
+    conn.close()
+
+    return task
+
+
+# Delete task
+def delete_task(task_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM tasks WHERE id = ?",
+        (task_id,)
+    )
+
+    conn.commit()
+
+    deleted = cursor.rowcount
+
+    conn.close()
+
+    return deleted > 0
